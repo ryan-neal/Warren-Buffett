@@ -66,5 +66,3 @@ def cleanup(token, lower = True):
 # top unigrams used in the reviews
 cleaned_list = [cleanup(word.string) for word in test if not isNoise(word)]
 print(Counter(cleaned_list).most_common(10))
-
-
