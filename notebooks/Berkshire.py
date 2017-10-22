@@ -7,6 +7,7 @@ import numpy as np
 import requests
 from bs4 import BeautifulSoup
 import textract
+import string
 import spacy
 import redis
 import itertools as it
@@ -18,6 +19,8 @@ import matplotlib.pyplot as plt
 import pandas_datareader.data as web
 import datetime
 import seaborn as sns
+import nltk
+from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from collections import Counter
 import pprint
@@ -42,27 +45,23 @@ def get_year(key):
     return str(yearly_report)
 
 #create_dictionary("/Users/ryanneal/Desktop/Warren-Buffett/data/raw")
-Ninety_83 = get_year(1983)
-test = nlp(Ninety_83)
+Ninety_83 = get_year(1983).lower()
+test = nltk.word_tokenize(Ninety_83)
+print(test[0])
 
-print(Ninety_83)
+useless_words = nltk.corpus.stopwords.words("english") + list(string.punctuation) + list("--") + list("...")
 
-#define some parameters
-min_token_length = 2
+def build_bag_of_words_features_filtered(words):
+    return {
+        word:1 for word in words \
+        if not word in useless_words}
 
-#Function to check if the token is a noise or not
-def isNoise(token):
-    is_noise = False
-    if token.is_stop == True:
-        is_noise = True
-    elif len(token.string) <= min_token_length:
-        is_noise = True
-    return is_noise
-def cleanup(token, lower = True):
-    if lower:
-       token = token.lower()
-    return token.strip()
+def filter_words(words):
+    return [word for word in words if not word in useless_words]
 
+word_counter = Counter(filter_words(test))
+most_common_words = word_counter.most_common()[:10]
+print(most_common_words)
 # top unigrams used in the reviews
-cleaned_list = [cleanup(word.string) for word in test if not isNoise(word)]
-print(Counter(cleaned_list).most_common(10))
+#cleaned_list = [cleanup(word.string) for word in test if not isNoise(word)]
+#print(Counter(cleaned_list).most_common(10))
