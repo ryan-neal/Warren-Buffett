@@ -33,7 +33,7 @@ nlp = spacy.load('en')
 r_server = redis.Redis("localhost")
 r_server.ping
 
-scrape_buffett()
+#scrape_buffett()
 
 def create_dictionary(directory):
     for file in os.listdir(directory):
@@ -44,30 +44,30 @@ def create_dictionary(directory):
             r_server.set(key, text)
     return True
 
-def get_year(key):
-    yearly_report = r_server.get(key)
-    return str(yearly_report)
-
 #create_dictionary("/Users/ryanneal/Desktop/Warren-Buffett/data/raw")
-Ninety_83 = get_year(1983).lower()
-test = nltk.word_tokenize(Ninety_83)
 
-useless_words = nltk.corpus.stopwords.words("english") + list(string.punctuation) + list("--") + list("...")
+def create_stems(year):
+    def get_year(year):
+        yearly_report = r_server.get(year)
+        return str(yearly_report)
 
-def build_bag_of_words_features_filtered(words):
-    return {
-        word:1 for word in words \
-        if not word in useless_words}
+    data = get_year(year).lower()
+    words = nltk.wordpunct_tokenize(data)
+    useless_words = nltk.corpus.stopwords.words("english") + list(string.punctuation)
 
-def filter_words(words):
-    return [word for word in words if not word in useless_words]
+    def filter_words(words):
+        return [word for word in words if not word in useless_words and len(word) > 1 and word.isalpha()]
 
-def stem(tokens):
-    porter = nltk.PorterStemmer()
-    return [porter.stem(t) for t in tokens]
+    def stem(tokens):
+        porter = nltk.PorterStemmer()
+        return [porter.stem(t) for t in tokens]
 
-print(stem(filter_words(test)))
+    return stem(filter_words(words))
 
-word_counter = Counter(stem(filter_words(test)))
-most_common_words = word_counter.most_common()[:10]
-print(most_common_words)
+
+def count_words(stems):
+    word_counter = Counter(stems)
+    most_common_words = word_counter.most_common()[:10]
+    return most_common_words
+
+print(count_words(create_stems(1989)))
