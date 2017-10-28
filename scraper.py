@@ -14,11 +14,18 @@ def scrape_buffett(save_dir=SAVE_DIRS['Buffett']):
 	page = urlopen('http://www.berkshirehathaway.com/letters/letters.html')
 	soup = BeautifulSoup(page.read(), 'lxml')	
 	tags = soup.findAll('a', {'href' : re.compile('.*\.(html)|(pdf)')})
+	
 	files = map(lambda tag: tag['href'], tags)
 	for file in files:
+		content = urlopen(header + file).read()
+		# Check if letter or directory
+		if file.endswith('.html'):
+			bs = BeautifulSoup(content, 'lxml')
+			if bs.title.string == '--IMPORTANT NOTE--':
+				file = bs.find('a', {'href' : re.compile('.*\.(pdf)')})['href']
+				content = urlopen(header + file).read()
 		local_file = open(save_dir+file, 'wb')
-		response = urlopen(header + file)
-		local_file.write(response.read())
+		local_file.write(content)
 		local_file.close()
 
 if __name__ == '__main__':
