@@ -24,8 +24,6 @@ import nltk
 from nltk.corpus import stopwords
 from collections import Counter
 import pprint
-import pandas_datareader.data as web
-import datetime
 
 r_server = redis.Redis("localhost")
 r_server.ping
