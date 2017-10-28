@@ -28,7 +28,7 @@ import pprint
 r_server = redis.Redis("localhost")
 r_server.ping
 
-#scrape_buffett()
+### SETUP CODE: TO MOVE ###
 
 def create_dictionary(directory):
     for file in os.listdir(directory):
@@ -38,36 +38,32 @@ def create_dictionary(directory):
             text = textract.process(directory + "/" + file)
             r_server.set(key, text)
     return True
-
+    
+#scrape_buffett()
 #create_dictionary("/Users/ryanneal/Desktop/Warren-Buffett/data/raw")
 
+### END SETUP CODE ###
+
+USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
+    
+def significant_word(word):
+	return word not in USELESS_WORDS or len(word) > 1 or word.isalpha()
+        
 def create_document(year):
     yearly_report = r_server.get(year)
     return str(yearly_report)
 
-def create_yearly_stems(year):
-    data = create_document(year).lower()
-    words = nltk.wordpunct_tokenize(data)
-    useless_words = stopwords.words("english") + list(string.punctuation)
-
-    def filter_words(words):
-        return [word for word in words if not word in useless_words and len(word) > 1 and word.isalpha()]
-
-    def stem(tokens):
+def create_stems(document_text):
+	""" Returns list of all unique stems used in a given document """
+	def stem(tokens):
         porter = nltk.PorterStemmer()
         return [porter.stem(t) for t in tokens]
+    data = document_text.lower()
+    words = nltk.wordpunct_tokenize(data)
+	return stem(filter(significant_word, words))
 
-    return stem(filter_words(words))
-
-def create_all_stems(years):
-    stems = []
-    for year in years:
-        stems.append(create_yearly_stems(year))
-    return stems
-
-
-def get_yearly_entities(year):
-    sentences = nltk.sent_tokenize(create_document(year))
+def get_entities(document_text):
+    sentences = nltk.sent_tokenize(document_text)
     tokenized_sentences = [nltk.word_tokenize(sentence) for sentence in sentences]
     tagged_sentences = [nltk.pos_tag(sentence) for sentence in tokenized_sentences]
     chunked_sentences = nltk.ne_chunk_sents(tagged_sentences, binary=True)
@@ -91,32 +87,3 @@ def get_yearly_entities(year):
 
         entity_names.extend(extract_entity_names(tree))
     return entity_names
-
-def get_all_entities(years):
-    entities = []
-    for year in years:
-        entities.append(get_yearly_entities(year))
-    return entities
-
-def count_entities(entities):
-    counter = Counter(entities)
-    return counter
-
-def count_words(stems):
-    word_counter = Counter(stems)
-    most_common_words = word_counter.most_common()[:10]
-    return most_common_words
-
-def count_all_words(stems):
-    dictionary = Counter()
-    for stem in stems:
-        dictionary.update(stem)
-    return dictionary
-
-def count_all_entities(entities):
-    dictionary = Counter()
-    for entity in entities:
-        counter = Counter(entity)
-        dictionary += counter
-    return dictionary
-
