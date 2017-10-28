@@ -15,7 +15,6 @@ import itertools as it
 import urllib3
 from gensim import corpora, summarization
 from gensim.models.ldamodel import LdaModel
-from gensim.parsing.preprocessing import STOPWORDS
 import matplotlib.pyplot as plt
 import pandas_datareader.data as web
 import datetime
@@ -122,3 +121,4 @@ def count_all_entities(entities):
         dictionary += counter
     return dictionary
 
+#print(len(count_all_words(create_all_stems(range(1977, 2017)))))
