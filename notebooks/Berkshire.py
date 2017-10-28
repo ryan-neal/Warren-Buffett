@@ -47,10 +47,10 @@ def create_document(year):
     yearly_report = r_server.get(year)
     return str(yearly_report)
 
-def create_stems(year):
+def create_yearly_stems(year):
     data = create_document(year).lower()
     words = nltk.wordpunct_tokenize(data)
-    useless_words = nltk.corpus.stopwords.words("english") + list(string.punctuation)
+    useless_words = stopwords.words("english") + list(string.punctuation)
 
     def filter_words(words):
         return [word for word in words if not word in useless_words and len(word) > 1 and word.isalpha()]
@@ -61,7 +61,14 @@ def create_stems(year):
 
     return stem(filter_words(words))
 
-def get_all_entitities(year):
+def create_all_stems(years):
+    stems = []
+    for year in years:
+        stems.append(create_yearly_stems(year))
+    return stems
+
+
+def get_yearly_entities(year):
     sentences = nltk.sent_tokenize(create_document(year))
     tokenized_sentences = [nltk.word_tokenize(sentence) for sentence in sentences]
     tagged_sentences = [nltk.pos_tag(sentence) for sentence in tokenized_sentences]
@@ -87,6 +94,12 @@ def get_all_entitities(year):
         entity_names.extend(extract_entity_names(tree))
     return entity_names
 
+def get_all_entities(years):
+    entities = []
+    for year in years:
+        entities.append(get_yearly_entities(year))
+    return entities
+
 def count_entities(entities):
     counter = Counter(entities)
     return counter
@@ -96,4 +109,16 @@ def count_words(stems):
     most_common_words = word_counter.most_common()[:10]
     return most_common_words
 
-print(count_entities(get_all_entitities(1982)))
+def count_all_words(stems):
+    dictionary = Counter()
+    for stem in stems:
+        dictionary.update(stem)
+    return dictionary
+
+def count_all_entities(entities):
+    dictionary = Counter()
+    for entity in entities:
+        counter = Counter(entity)
+        dictionary += counter
+    return dictionary
+
