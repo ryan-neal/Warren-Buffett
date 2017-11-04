@@ -1,8 +1,6 @@
 """
 Module to interact with the MongoDB database.
-
-Requires a locally running database
-
+Requires a locally running mongodb client
 """
 import logging
 
@@ -30,13 +28,18 @@ class DatabaseOperations():
         self.db = db
         self.collection = db.reports
 
-    def format_report(self, report):
+    def format_report(self, file_dump):
         return
 
     def insert_report(self, report):
         return
 
     def import_from_file(self):
+        # open file
+        # get data
+        # format data into dict
+        # insert data into db
+        # cleanup
         return
 
     def get_all_reports(self):
