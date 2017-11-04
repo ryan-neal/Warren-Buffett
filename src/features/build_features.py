@@ -51,7 +51,7 @@ def create_stems(document_text):
     return stem(filter(significant_word, words))
 
 
-def get_entities(document_text):
+def get_entities(document_text, entity_type=None):
     """ Given the raw text of a document, returns all named entities as a
         list of tuples in the form of (NE type, entity_name)
      """
@@ -63,6 +63,11 @@ def get_entities(document_text):
     entity_trees = filter(lambda word: type(word) is not tuple, chunked_document)
     entity_names = [(word.label(), ' '.join([child[0] for child in word]))
                     for word in entity_trees]
+	
+	# Optional: Filter entities based on type
+    if entity_type:
+    	return [e for e in entity_names if e[0].lower() == entity_type.lower()]
+    
     return entity_names
 
 def get_word_count(document_text):
@@ -79,11 +84,9 @@ def get_sentence_count(document_text):
 	return len(nltk.sent_tokenize(document_text))
 
 def main():
-    #print(get_entities(create_document(1999)))
+    print(get_entities(create_document(1999), 'person'))
     #print(create_stems(create_document(1999)))
-    print(get_word_count(create_document(1984)))
-    print(get_average_word_length('test three five'))
-    print(get_sentence_count('I walk. I run. They sleep? We have.'))
+    
 
 
 # counters = [Counter(create_stems(create_document(year))) for year in range(1999, 2000)]
