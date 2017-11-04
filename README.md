@@ -56,7 +56,14 @@ Project Organization
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
 
 
-#Additional requirements
-Redis
-Mongodb (https://docs.mongodb.com/manual/installation/)
-Textract Related (http://textract.readthedocs.io/en/stable/installation.html) must be installed before running pip requirements
+Project Setup
+------------
+
+### Install Required Libraries
+- Redis (https://redis.io/topics/quickstart)
+- MongoDB (https://docs.mongodb.com/manual/installation/)
+- Textract (http://textract.readthedocs.io/en/stable/installation.html)
+
+
+### Run pip
+    pip install -r requirements.txt
