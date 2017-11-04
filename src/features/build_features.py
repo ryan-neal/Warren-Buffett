@@ -66,9 +66,18 @@ def get_entities(document_text):
                     for word in entity_trees]
     return entity_names
 
+def get_length(document_text):
+    word_token = nltk.wordpunct_tokenize(document_text)
+    word_token = [word for word in word_token if word.isalpha()]
+    return (len(word_token))
+
+def get_average_word_length(document_text):
+    pass
+
 def main():
-    print(get_entities(create_document(1999)))
-    print(create_stems(create_document(1999)))
+    #print(get_entities(create_document(1999)))
+    #print(create_stems(create_document(1999)))
+    print(get_length(create_document(1984)))
 
 
 # counters = [Counter(create_stems(create_document(year))) for year in range(1999, 2000)]
