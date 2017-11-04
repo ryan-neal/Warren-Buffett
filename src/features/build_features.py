@@ -26,21 +26,19 @@ from nltk.corpus import stopwords
 from collections import Counter
 import pprint
 
+import pymongo
 
-r_server = redis.Redis("localhost")
-r_server.ping
+client = pymongo.MongoClient()
+db = client['BerkshireHathaway']['reports']
 
+def create_document(year):
+    """ Given a year, query MongoDB for the corresponding report """
+    return str(db.find_one({'year':str(year)})['text'])
 
 USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
 
 def significant_word(word):
     return word not in USELESS_WORDS or len(word) > 1 or word.isalpha()
-
-
-def create_document(year):
-    """ Given a year, query Redis for the corresponding report """
-    yearly_report = r_server.get(year)
-    return str(yearly_report)
 
 def create_stems(document_text):
     """ Given the raw text of a document, return list of all unique stems """
@@ -107,8 +105,10 @@ def main():
     print(get_entities(create_document(1999), 'person'))
     #print(create_stems(create_document(1999)))
 
-
 # counters = [Counter(create_stems(create_document(year))) for year in range(1999, 2000)]
 # print(counters)
 # word_counter = sum(counters, Counter())
 # print(len(word_counter.keys()))
+
+if __name__ == '__main__':
+	main()
