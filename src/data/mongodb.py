@@ -33,7 +33,7 @@ class DatabaseOperations():
         self.db = db
 
     def insert_document(self, collection_name, document):
-        "Inserts a document into a given collection"
+        """Inserts a document into a given collection"""
 
         try:
             inserted_doc = self.db[collection_name].insert_one(document)
@@ -43,7 +43,7 @@ class DatabaseOperations():
         return inserted_doc
 
     def import_model_from_path(self, model, data_path):
-        "Imports multiple documents from a given path structred as one model"
+        """Imports multiple documents from a given path structred as one model"""
 
         if os.path.exists(data_path):
             file_directory = os.listdir(data_path)
