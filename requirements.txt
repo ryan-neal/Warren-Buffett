@@ -4,6 +4,8 @@ coverage
 awscli
 flake8
 bs4
+lxml
+textract
 python-dotenv>=0.5.1
 
 # MongoDB Libraries

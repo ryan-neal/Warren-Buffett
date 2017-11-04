@@ -34,5 +34,6 @@ if __name__ == '__main__':
     try:
         if sys.argv[1] == 'buffett':
             scrape_buffett()
-    except:
+    except Exception as e:
+        print(e)
         pass
