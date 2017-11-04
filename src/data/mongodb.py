@@ -2,6 +2,8 @@
 Module to interact with the MongoDB database.
 Requires a locally running mongodb client
 """
+
+import os
 import logging
 
 from pymongo import MongoClient
@@ -13,34 +15,44 @@ class DatabaseClient():
         self.client = None
         self.db = None
 
-    def connect_to_localdb(self):
+    def connect_to_localdb(self, client_name="BerkshireHathaway"):
         # Connects to locally running db at 'mongodb://localhost:27017/'
         try:
             self.client = MongoClient()
         except ConnectionFailure:
             logging.exception("Could not connect to local MongoDB Database :(")
 
-        self.db = self.client['warren-buffet']
+        self.db = self.client[client_name]
+
+    def disconnect_client(self):
+        self.client.close()
 
 
 class DatabaseOperations():
     def __init__(self, db):
         self.db = db
-        self.collection = db.reports
 
-    def format_report(self, file_dump):
-        return
+    def insert_document(self, collection_name, document):
+        "Inserts a document into a given collection"
 
-    def insert_report(self, report):
-        return
+        try:
+            inserted_doc = self.db[collection_name].insert_one(document)
+        except Exception:
+            logging.exception("Could not write data into collection {}".format(collection_name))
 
-    def import_from_file(self):
-        # open file
-        # get data
-        # format data into dict
-        # insert data into db
-        # cleanup
-        return
+        return inserted_doc
 
-    def get_all_reports(self):
+    def import_model_from_path(self, model, data_path):
+        "Imports multiple documents from a given path structred as one model"
+
+        if os.path.exists(data_path):
+            file_directory = os.listdir(data_path)
+        else:
+            logging.error("Path {} does not exist.".format(data_path))
+            raise Exception
+
+        for file_name in file_directory:
+            if file_name[0] != ".":
+                document = model.process_from_file(file_name)
+                self.insert_document(model.COLLECTION_NAME, document)
         return
