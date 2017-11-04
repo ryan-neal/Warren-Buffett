@@ -1,5 +1,5 @@
 from bokeh.plotting import figure, show, output_file
-from src.features.build_features import word_count, create_document
+from src.features.build_features import get_word_count, create_document
 
 def word_count_year(all_years):
     years = []
@@ -7,7 +7,7 @@ def word_count_year(all_years):
 
     for year in all_years:
         years.append(year)
-        word_counts.append(word_count(create_document(year)))
+        word_counts.append(get_word_count(create_document(year)))
 
     p1 = figure(title="Word Count Per Year")
     p1.grid.grid_line_alpha = 0.3
