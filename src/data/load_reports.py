@@ -5,8 +5,8 @@ Loads reports from files to the local mongo databse
 import os
 import re
 import textract
-
-import mongodb
+import pymongo
+from src.data import mongodb
 
 DOC_PATH = os.getcwd().rsplit('Warren-Buffett', 1)[0] + os.path.join('Warren-Buffett', 'data', 'raw')
 
