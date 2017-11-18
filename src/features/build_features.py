@@ -1,29 +1,13 @@
 from datetime import date
-import pandas as pd
 from pandas_datareader import DataReader as dr
-import sys
-import os
-import re
-import json
 import pandas as pd
 import numpy as np
-import requests
-from bs4 import BeautifulSoup
-import textract
 import string
-import spacy
-import redis
 import itertools as it
-import urllib3
-import matplotlib.pyplot as plt
-import pandas_datareader.data as web
-import datetime
 import seaborn as sns
 import nltk
 from nltk.corpus import stopwords
 from collections import Counter
-import pprint
-from src.data.load_reports import load_data
 
 import pymongo
 
@@ -38,10 +22,7 @@ def create_document(year):
 USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
 
 def significant_word(word):
-    return word not in USELESS_WORDS and len(word) > 1# and word.isalpha()
-
-def clean_document(document_text):
-    pass
+    return word not in USELESS_WORDS and len(word) > 1
 
 def get_stems(document_text):
     """ Given the raw text of a document, return list of all unique stems """
@@ -104,6 +85,38 @@ def get_market_returns():
 
     return ts_annualret
 
+def get_good_years():
+    df = get_market_returns()
+    df.index = df.index.strftime('%Y')
+    good_years = df[df["BRK-A"] > 0]
+    arr = np.array(good_years.index)
+    inter = lambda x: (int(x) -1 )
+    funct = np.vectorize(inter)
+    return (funct(arr))
+
+def get_good():
+    return_list = []
+    for year in get_good_years():
+        doc = create_document(year)
+        return_list.append(get_noun_phrases(doc))
+    return list(it.chain.from_iterable(return_list))
+
+def get_bad():
+    return_list = []
+    for year in get_bad_years():
+        doc = create_document(year)
+        return_list.append(get_noun_phrases(doc))
+    return list(it.chain.from_iterable(return_list))
+
+def get_bad_years():
+    df = get_market_returns()
+    df.index = df.index.strftime('%Y')
+    bad_years = df[df["BRK-A"] <= 0]
+    arr = np.array(bad_years.index)
+    inter = lambda x: (int(x) -1 )
+    funct = np.vectorize(inter)
+    return (funct(arr))
+
 def freq_words(document_text):
     freqdist = nltk.FreqDist()
 
@@ -121,8 +134,7 @@ def get_tags(document_text):
 def get_noun_phrases(document_text):
     tagged_words = get_tags(document_text)
     new_patterns = """
-        NP:    {<DT><WP><VBP>*<RB>*<VBN><IN><NN>}
-               {<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}
+        NP:    {<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}
                {<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}
                {<JJ>*<NN|NNS|NNP|NNPS>+}
 
@@ -142,11 +154,17 @@ def get_noun_phrases(document_text):
 def main():
     #print(get_entities(create_document(1999), 'person'))
     #print(get_tags(create_document(1999)))
-    print(get_noun_phrases(create_document(1999)))
-    #print(get_stems(create_document(1999)))
-    #x = freq_words(create_document(1999))
-    #for key, value in x.items():
-    #    print(key, value)
+    #print(get_noun_phrases(create_document(1979)))
+    print(get_market_returns())
+    #print(get_good_years())
+    #print(get_bad_years())
+    #goods = set(get_good())
+    #bads = set(get_bad())
+    #good_set = goods - bads
+    #bad_set = bads-goods
+    #print(good_set)
+    #print(bad_set)
+
 
 
 if __name__ == '__main__':
