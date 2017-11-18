@@ -1,9 +1,23 @@
 from datetime import date
+import pandas as pd
 from pandas_datareader import DataReader as dr
+import sys
+import os
+import re
+import json
 import pandas as pd
 import numpy as np
+import requests
+from bs4 import BeautifulSoup
+import textract
 import string
+import spacy
+import redis
 import itertools as it
+import urllib3
+import matplotlib.pyplot as plt
+import pandas_datareader.data as web
+import datetime
 import seaborn as sns
 import nltk
 from nltk.corpus import stopwords
@@ -68,55 +82,6 @@ def get_average_word_length(document_text):
 def get_sentence_count(document_text):
 	return len(nltk.sent_tokenize(document_text))
 
-def get_market_returns():
-    '''Getting Berkshire & SP 500 returns'''
-    start_date = date(1979, 12, 31)
-    end_date = date(2016, 12, 31)
-    y_bk = dr('BRK-A', 'yahoo', start=start_date)
-    y_bk = y_bk['Adj Close']
-    y_sp = dr('^SP500TR', 'yahoo', start=start_date) #TODO: Get longer backfill
-    y_sp = y_sp['Adj Close']
-    ts = pd.concat([y_bk, y_sp], axis=1)
-    ts.columns.values[0] = 'BRK-A'
-    ts.columns.values[1] = 'SP500TR'
-    dates_ann = pd.date_range(start_date, end_date, freq='A')
-    ts_annualret = ts.reindex(dates_ann, method='ffill').pct_change()
-    ts_annualret.pct_change()
-
-    return ts_annualret
-
-def get_good_years():
-    df = get_market_returns()
-    df.index = df.index.strftime('%Y')
-    good_years = df[df["BRK-A"] > 0]
-    arr = np.array(good_years.index)
-    inter = lambda x: (int(x) -1 )
-    funct = np.vectorize(inter)
-    return (funct(arr))
-
-def get_good():
-    return_list = []
-    for year in get_good_years():
-        doc = create_document(year)
-        return_list.append(get_noun_phrases(doc))
-    return list(it.chain.from_iterable(return_list))
-
-def get_bad():
-    return_list = []
-    for year in get_bad_years():
-        doc = create_document(year)
-        return_list.append(get_noun_phrases(doc))
-    return list(it.chain.from_iterable(return_list))
-
-def get_bad_years():
-    df = get_market_returns()
-    df.index = df.index.strftime('%Y')
-    bad_years = df[df["BRK-A"] <= 0]
-    arr = np.array(bad_years.index)
-    inter = lambda x: (int(x) -1 )
-    funct = np.vectorize(inter)
-    return (funct(arr))
-
 def freq_words(document_text):
     freqdist = nltk.FreqDist()
 
@@ -131,40 +96,48 @@ def get_tags(document_text):
     tagged_words = [nltk.pos_tag(word) for word in tokenized_words]
     return tagged_words
 
-def get_noun_phrases(document_text):
-    tagged_words = get_tags(document_text)
-    new_patterns = """
-        NP:    {<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}
-               {<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}
-               {<JJ>*<NN|NNS|NNP|NNPS>+}
+def generate_expression(key):
+	# TODO: Make constant
+	EXPRESSIONS = {
+		'noun in noun':'{<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}',
+		'adjective_noun_noun':'{<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}',
+		'adjective_noun':'{<JJ>*<NN|NNS|NNP|NNPS>+}',
+		'passive_voice':'{<VB|VBD><VBN>+}'
+	}
+	# TODO: Refactor passive voice
+	return EXPRESSIONS[key.lower()]
 
+
+def get_phrases(document_text, expressions):
+    """ Chunk phrases based on input parameters. Return list of tuples
+            in the format (phrase, containing sentence).
         """
+
+    new_patterns = 'Phrases: ' + '\n'.join(expressions)
     chunker = nltk.RegexpParser(new_patterns)
+
+    tagged_words = get_tags(document_text)
     word_tree = [chunker.parse(word) for word in tagged_words]  # Identify NP chunks
-    nps = []
+    phrases = []
+
     for sent in word_tree:
-        tree = chunker.parse(sent)
-        for subtree in tree.subtrees():
-            if subtree.label() == 'NP':
-                t = subtree
-                t = ' '.join(word for word, tag in t.leaves())
-                nps.append(t)
-    return nps
+        sentence = ' '.join(word for word, tag in sent.leaves())
+        for subtree in sent.subtrees():
+            if subtree.label() == 'Phrases':
+                phrase = ' '.join(word for word, tag in subtree.leaves())
+                phrases.append((phrase, sentence))
+
+    return phrases
+
 
 def main():
     #print(get_entities(create_document(1999), 'person'))
     #print(get_tags(create_document(1999)))
-    #print(get_noun_phrases(create_document(1979)))
-    print(get_market_returns())
-    #print(get_good_years())
-    #print(get_bad_years())
-    #goods = set(get_good())
-    #bads = set(get_bad())
-    #good_set = goods - bads
-    #bad_set = bads-goods
-    #print(good_set)
-    #print(bad_set)
-
+    print(get_noun_phrases(create_document(1999)))
+    #print(get_stems(create_document(1999)))
+    #x = freq_words(create_document(1999))
+    #for key, value in x.items():
+    #    print(key, value)
 
 
 if __name__ == '__main__':
