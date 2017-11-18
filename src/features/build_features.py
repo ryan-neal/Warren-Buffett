@@ -23,19 +23,18 @@ import nltk
 from nltk.corpus import stopwords
 from collections import Counter
 import pprint
-from src.data.load_reports import load_data
+#from src.data.load_reports import load_data
 
 import pymongo
 
 client = pymongo.MongoClient()
 db = client['BerkshireHathaway']['reports']
 
+USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
 
 def create_document(year):
     """ Given a year, query MongoDB for the corresponding report """
     return db.find_one({'year':str(year)})['text'].decode('utf-8')
-
-USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
 
 def significant_word(word):
     return word not in USELESS_WORDS and len(word) > 1# and word.isalpha()
@@ -120,13 +119,13 @@ def get_tags(document_text):
 
 def get_noun_phrases(document_text):
     tagged_words = get_tags(document_text)
-    new_patterns = """
-        NP:    {<DT><WP><VBP>*<RB>*<VBN><IN><NN>}
-               {<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}
-               {<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}
-               {<JJ>*<NN|NNS|NNP|NNPS>+}
-
-        """
+    
+    new_pattern_list = [
+    	'{<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}',
+    	'{<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}',
+    	'{<JJ>*<NN|NNS|NNP|NNPS>+}'
+    ]
+    new_patterns = 'NP: ' + '\n'.join(new_pattern_list) 
     chunker = nltk.RegexpParser(new_patterns)
     word_tree = [chunker.parse(word) for word in tagged_words]  # Identify NP chunks
     nps = []
@@ -142,7 +141,7 @@ def get_noun_phrases(document_text):
 def main():
     #print(get_entities(create_document(1999), 'person'))
     #print(get_tags(create_document(1999)))
-    print(get_noun_phrases(create_document(1999)))
+    #print(get_noun_phrases(create_document(1999)))
     #print(get_stems(create_document(1999)))
     #x = freq_words(create_document(1999))
     #for key, value in x.items():
