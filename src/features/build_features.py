@@ -118,18 +118,22 @@ def get_tags(document_text):
 		return tagged_words
 		
 
-def get_phrases(document_text, expressions=[]):
+def generate_expression(key):
+	# TODO: Make constant
+	EXPRESSIONS = {
+		'noun in noun':'{<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}',
+		'adjective_noun_noun':'{<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}',
+		'adjective_noun':'{<JJ>*<NN|NNS|NNP|NNPS>+}',
+		'passive_voice':'{<VB|VBD><VBN>+}'
+	}
+	# TODO: Refactor passive voice
+	return EXPRESSIONS[key.lower()]
+
+
+def get_phrases(document_text, expressions):
 	""" Chunk phrases based on input parameters. Return list of tuples
 		in the format (phrase, containing sentence).
 	"""
-	
-	# TODO: Refactor as input parameter
-	expressions = [
-		#'{<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}',
-		#'{<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}',
-		#'{<JJ>*<NN|NNS|NNP|NNPS>+}'
-		'{<VB|VBD><VBN>+}' # Passive voice
-	]
 		
 	new_patterns = 'Phrases: ' + '\n'.join(expressions) 
 	chunker = nltk.RegexpParser(new_patterns)
@@ -148,8 +152,8 @@ def get_phrases(document_text, expressions=[]):
 	return phrases
 
 def main():
-	print('\n'.join(': '.join(tup) 
-		for tup in get_phrases(create_document(1999))))
+	pv = get_phrases(create_document(1999), [generate_expression('passive_voice')])
+	print('\n'.join(': '.join(tup) for tup in pv))
 	#print(create_document(1999))
 	#print(get_entities(create_document(1999), 'person'))
 	#print(get_tags(create_document(1999)))
