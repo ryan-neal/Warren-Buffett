@@ -22,8 +22,6 @@ import seaborn as sns
 import nltk
 from nltk.corpus import stopwords
 from collections import Counter
-import pprint
-from src.data.load_reports import load_data
 
 import pymongo
 
@@ -38,10 +36,7 @@ def create_document(year):
 USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
 
 def significant_word(word):
-    return word not in USELESS_WORDS and len(word) > 1# and word.isalpha()
-
-def clean_document(document_text):
-    pass
+    return word not in USELESS_WORDS and len(word) > 1
 
 def get_stems(document_text):
     """ Given the raw text of a document, return list of all unique stems """
@@ -87,23 +82,6 @@ def get_average_word_length(document_text):
 def get_sentence_count(document_text):
 	return len(nltk.sent_tokenize(document_text))
 
-def get_market_returns():
-    '''Getting Berkshire & SP 500 returns'''
-    start_date = date(1979, 12, 31)
-    end_date = date(2016, 12, 31)
-    y_bk = dr('BRK-A', 'yahoo', start=start_date)
-    y_bk = y_bk['Adj Close']
-    y_sp = dr('^SP500TR', 'yahoo', start=start_date) #TODO: Get longer backfill
-    y_sp = y_sp['Adj Close']
-    ts = pd.concat([y_bk, y_sp], axis=1)
-    ts.columns.values[0] = 'BRK-A'
-    ts.columns.values[1] = 'SP500TR'
-    dates_ann = pd.date_range(start_date, end_date, freq='A')
-    ts_annualret = ts.reindex(dates_ann, method='ffill').pct_change()
-    ts_annualret.pct_change()
-
-    return ts_annualret
-
 def freq_words(document_text):
     freqdist = nltk.FreqDist()
 
@@ -118,26 +96,39 @@ def get_tags(document_text):
     tagged_words = [nltk.pos_tag(word) for word in tokenized_words]
     return tagged_words
 
-def get_noun_phrases(document_text):
-    tagged_words = get_tags(document_text)
-    new_patterns = """
-        NP:    {<DT><WP><VBP>*<RB>*<VBN><IN><NN>}
-               {<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}
-               {<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}
-               {<JJ>*<NN|NNS|NNP|NNPS>+}
+def generate_expression(key):
+	# TODO: Make constant
+	EXPRESSIONS = {
+		'noun in noun':'{<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}',
+		'adjective_noun_noun':'{<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}',
+		'adjective_noun':'{<JJ>*<NN|NNS|NNP|NNPS>+}',
+		'passive_voice':'{<VB|VBD><VBN>+}'
+	}
+	# TODO: Refactor passive voice
+	return EXPRESSIONS[key.lower()]
 
+
+def get_phrases(document_text, expressions):
+    """ Chunk phrases based on input parameters. Return list of tuples
+            in the format (phrase, containing sentence).
         """
+
+    new_patterns = 'Phrases: ' + '\n'.join(expressions)
     chunker = nltk.RegexpParser(new_patterns)
+
+    tagged_words = get_tags(document_text)
     word_tree = [chunker.parse(word) for word in tagged_words]  # Identify NP chunks
-    nps = []
+    phrases = []
+
     for sent in word_tree:
-        tree = chunker.parse(sent)
-        for subtree in tree.subtrees():
-            if subtree.label() == 'NP':
-                t = subtree
-                t = ' '.join(word for word, tag in t.leaves())
-                nps.append(t)
-    return nps
+        sentence = ' '.join(word for word, tag in sent.leaves())
+        for subtree in sent.subtrees():
+            if subtree.label() == 'Phrases':
+                phrase = ' '.join(word for word, tag in subtree.leaves())
+                phrases.append((phrase, sentence))
+
+    return phrases
+
 
 def main():
     #print(get_entities(create_document(1999), 'person'))

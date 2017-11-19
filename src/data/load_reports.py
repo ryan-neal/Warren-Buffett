@@ -12,7 +12,7 @@ DOC_PATH = os.getcwd().rsplit('Warren-Buffett', 1)[0] + os.path.join('Warren-Buf
 
 class Report():
     def __init__(self):
-        self.FIELDS = ['year', 'text']
+        self.FIELDS = ['year', 'text', 'berk_earnings']
         self.COLLECTION_NAME = 'reports'
 
     def process_from_file(self, file_name):
