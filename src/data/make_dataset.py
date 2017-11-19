@@ -3,9 +3,9 @@ import os
 import click
 import logging
 from dotenv import find_dotenv, load_dotenv
-from src.data.scraper import scrape_buffett
-from src.data.load_reports import load_data
-from src.definitions import DATA_DIR
+from scraper import scrape_buffett
+from load_reports import load_data
+from src.global_settings import DATA_DIR
 
 
 @click.command()
@@ -20,11 +20,12 @@ def main(input_filepath, output_filepath):
     logger.info('making final data set from raw data')
 
     # if files are in there do not override
-    if os.path.exists(data_path):
-        file_directory = os.listdir(data_path)
-    else:
-        logging.error("Path {} does not exist.".format(data_path))
-        raise Exception
+    # chec
+    # if os.path.exists(DATA_DIR):
+    #     file_directory = os.listdir(DATA_DIR)
+    # else:
+    #     logging.error("Path {} does not exist.".format(DATA_DIR))
+    #     raise Exception
 
     scrape_buffett()
 
@@ -42,4 +43,5 @@ if __name__ == '__main__':
     # load up the .env entries as environment variables
     load_dotenv(find_dotenv())
 
-    main()
+    # main()
+    print(DATA_DIR)

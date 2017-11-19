@@ -3,10 +3,15 @@ import os
 
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+from src.global_settings import SRC_DIR
 
 SAVE_DIRS = {
     'Buffett': os.getcwd().rsplit('Warren-Buffett', 1)[0] + os.path.join('Warren-Buffett', 'data', 'raw') + os.sep
 }
+
+
+def check_file_integrity():
+    return
 
 
 def scrape_buffett(save_dir=SAVE_DIRS['Buffett']):
@@ -20,6 +25,7 @@ def scrape_buffett(save_dir=SAVE_DIRS['Buffett']):
     tags = soup.findAll('a', {'href': re.compile('.*\.(html)|(pdf)')})
 
     file_names = map(lambda tag: tag['href'], tags)
+
     for file_name in file_names:
         if os.path.exists(save_dir + file_name):
             continue  # we already scraped this
@@ -38,7 +44,9 @@ def scrape_buffett(save_dir=SAVE_DIRS['Buffett']):
 
 
 if __name__ == '__main__':
-    try:
-        scrape_buffett()
-    except Exception as e:
-        print(e)
+    # try:
+    #     scrape_buffett()
+    # except Exception as e:
+    #     print(e)
+
+    print(SRC_DIR)

@@ -67,3 +67,17 @@ Project Setup
 
 ### Run pip
     pip install -r requirements.txt
+
+
+Troubleshooting
+------------
+
+**ModuleNotFoundError: No module named 'src'** -- This happens if the project path was not added to the `PYTHONPATH`
+- if using virtualenvwrapper:
+```
+$ add2virtualenv path_to_project
+```
+- Not using a virtualenv
+```
+export PYTHONPATH=$PYTHONPATH:/<path_to_project>
+```
