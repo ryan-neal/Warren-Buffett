@@ -5,16 +5,19 @@ Loads reports from files to the local mongo databse
 import os
 import re
 import textract
+import numpy as np
+from src.data.market_returns import clean_buffett, get_market_returns
 from src.data import mongodb
 from src.global_settings import DATA_RAW_DIR
 
 DOC_PATH = DATA_RAW_DIR
 
+x = get_market_returns()
 
 class Report():
     def __init__(self):
         # Required variables
-        self.FIELDS = ['year', 'text']
+        self.FIELDS = ['year', 'text', 'brk-returns']
         self.COLLECTION_NAME = 'reports'
 
         # optional variables
@@ -25,7 +28,8 @@ class Report():
 
         data = {
             'year': "".join(re.findall(r'\d+', os.path.basename(file_path))),
-            'text': (textract.process(file_path, encoding='unicode_escape').decode('utf-8', 'ignore'))
+            'text': (textract.process(file_path, encoding='unicode_escape').decode('utf-8', 'ignore')),
+            'brk-returns': clean_buffett(x).loc[str("".join(re.findall(r'\d+', os.path.basename(file_path))))]
         }
         return data
 
