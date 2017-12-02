@@ -13,19 +13,27 @@ DOC_PATH = DATA_RAW_DIR
 
 class Report():
     def __init__(self):
+        # Required variables
         self.FIELDS = ['year', 'text']
         self.COLLECTION_NAME = 'reports'
+
+        # optional variables
         self.UNIQUE_INDEX = 'year'
 
     def data_from_file(self, file_path):
+        """ Process data from a file from a given path to a dictionary format """
+
         data = {
             'year': "".join(re.findall(r'\d+', os.path.basename(file_path))),
-            'text': str(textract.process(file_path, encoding='unicode_escape'))
+            'text': (textract.process(file_path, encoding='unicode_escape').decode('utf-8', 'ignore'))
         }
         return data
 
     def setup_db(self, db):
+        """ Sets up the collection in the db to correctly accept documents"""
+
         db[self.COLLECTION_NAME].create_index(self.UNIQUE_INDEX, unique=True)
+
         return
 
 

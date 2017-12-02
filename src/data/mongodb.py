@@ -9,6 +9,7 @@ import logging
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
+# TODO: move to global
 log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(level=logging.INFO, format=log_fmt)
 
@@ -41,6 +42,8 @@ class DatabaseOperations():
         collection_name = model.COLLECTION_NAME
         collection = self.db[collection_name]
         logging.info("inserting data into collection <{}>".format(collection_name))
+
+        # if documents can be unique, update if found
         if model.UNIQUE_INDEX:
             coll_filter = {model.UNIQUE_INDEX: document[model.UNIQUE_INDEX]}
             if collection.find_one(coll_filter):
@@ -52,6 +55,8 @@ class DatabaseOperations():
                     logging.exception("Could not write data into collection {}".format(collection_name))
 
                 return
+
+        # else insert new document
         logging.info("inserting new data")
         try:
             collection.insert_one(document)
