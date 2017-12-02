@@ -11,7 +11,7 @@ db = client['BerkshireHathaway']['reports']
 
 def create_document(year):
     """ Given a year, query MongoDB for the corresponding report """
-    return db.find_one({'year':str(year)})['text'].decode('utf-8')
+    return db.find_one({'year':str(year)})['text']
 
 USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
 
@@ -111,9 +111,8 @@ def get_phrases(document_text, expressions):
 
 
 def main():
-    print(get_phrases(create_document(1999), 'noun_in_noun' ))
-    #print(get_stems(create_document(1999)))
-    #x = freq_words(create_document(1999))
+    #print(get_phrases(create_document(1999), 'noun_in_noun' ))
+    print(create_document(1999))
     #for key, value in x.items():
     #    print(key, value)
 

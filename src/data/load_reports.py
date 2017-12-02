@@ -28,7 +28,7 @@ class Report():
 
         data = {
             'year': "".join(re.findall(r'\d+', os.path.basename(file_path))),
-            'text': (textract.process(file_path, encoding='unicode_escape').decode('utf-8', 'ignore')),
+            'text': (textract.process(file_path).decode('utf-8')),
             'brk-returns': clean_buffett(x).loc[str("".join(re.findall(r'\d+', os.path.basename(file_path))))]
         }
         return data
