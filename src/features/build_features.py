@@ -1,24 +1,4 @@
-from datetime import date
-import pandas as pd
-from pandas_datareader import DataReader as dr
-import sys
-import os
-import re
-import json
-import pandas as pd
-import numpy as np
-import requests
-from bs4 import BeautifulSoup
-import textract
 import string
-import spacy
-import redis
-import itertools as it
-import urllib3
-import matplotlib.pyplot as plt
-import pandas_datareader.data as web
-import datetime
-import seaborn as sns
 import nltk
 from nltk.corpus import stopwords
 from collections import Counter
@@ -99,7 +79,7 @@ def get_tags(document_text):
 def generate_expression(key):
 	# TODO: Make constant
 	EXPRESSIONS = {
-		'noun in noun':'{<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}',
+		'noun_in_noun':'{<NN|NNS|NNP|NNPS><IN>*<NN|NNS|NNP|NNPS>+}',
 		'adjective_noun_noun':'{<JJ>*<NN|NNS|NNP|NNPS><CC>*<NN|NNS|NNP|NNPS>+}',
 		'adjective_noun':'{<JJ>*<NN|NNS|NNP|NNPS>+}',
 		'passive_voice':'{<VB|VBD><VBN>+}'
@@ -131,10 +111,8 @@ def get_phrases(document_text, expressions):
 
 
 def main():
-    #print(get_entities(create_document(1999), 'person'))
-    #print(get_tags(create_document(1999)))
-    #print(get_noun_phrases(create_document(1999)))
-    print(get_stems(create_document(1999)))
+    print(get_phrases(create_document(1999), 'noun_in_noun' ))
+    #print(get_stems(create_document(1999)))
     #x = freq_words(create_document(1999))
     #for key, value in x.items():
     #    print(key, value)

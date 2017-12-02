@@ -59,7 +59,7 @@ class DatabaseOperations():
                 self.insert_document(model.COLLECTION_NAME, document)
         return
 
-    def data_dict_to_doc(model, data):
+    def data_dict_to_doc(self, model, data):
         document = {}
         for field in model.FIELDS:
             if field in data:
