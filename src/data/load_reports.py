@@ -5,27 +5,23 @@ Loads reports from files to the local mongo databse
 import os
 import re
 import textract
-import pymongo
 from src.data import mongodb
+from src.global_settings import DATA_RAW_DIR
 
-DOC_PATH = os.getcwd().rsplit('Warren-Buffett', 1)[0] + os.path.join('Warren-Buffett', 'data', 'raw')
+DOC_PATH = DATA_RAW_DIR
 
 
 class Report():
     def __init__(self):
-        self.FIELDS = ['year', 'text', 'berk_earnings']
+        self.FIELDS = ['year', 'text']
         self.COLLECTION_NAME = 'reports'
 
-    def process_from_file(self, file_name):
-        file_path = os.path.join(DOC_PATH, file_name)
-        year = "".join(re.findall(r'\d+', file_name))
-        file_text = textract.process(file_path)
-
-        report = {
-            'year': year,
-            'text': file_text
+    def data_from_file(self, file_path):
+        data = {
+            'year': "".join(re.findall(r'\d+', os.path.basename(file_path))),
+            'text': textract.process(file_path)
         }
-        return report
+        return data
 
 
 def load_data():
