@@ -33,14 +33,14 @@ def main(input_filepath=None, output_filepath=None):
 
         if missing:
             missing_str = ", ".join(map(str, missing))
-            logging.info('missing years: {}'.format(missing_str))
-            logging.info('running buffet scraper')
+            logger.info('missing years: {}'.format(missing_str))
+            logger.info('running buffet scraper')
             scrape_buffett()
         else:
             logger.info('data already exists. not running buffet scraper')
     else:
-        logging.info("Path {} does not exist.".format(DATA_RAW_DIR))
-        logging.info('running buffet scraper')
+        logger.info("Path {} does not exist.".format(DATA_RAW_DIR))
+        logger.info('running buffet scraper')
         scrape_buffett()
 
     logger.info('loading data into db')
