@@ -16,10 +16,9 @@ class Report():
         self.FIELDS = ['year', 'text']
         self.COLLECTION_NAME = 'reports'
 
-    def data_from_file(self, file_name):
-        file_path = os.path.join(DOC_PATH, file_name)
+    def data_from_file(self, file_path):
         data = {
-            'year': "".join(re.findall(r'\d+', file_name)),
+            'year': "".join(re.findall(r'\d+', os.path.basename(file_path))),
             'text': textract.process(file_path)
         }
         return data

@@ -53,7 +53,8 @@ class DatabaseOperations():
 
         for file_name in file_directory:
             if file_name[0] != ".":
-                document_data = model.data_from_file(file_name)
+                file_path = os.path.join(data_path, file_name)
+                document_data = model.data_from_file(file_path)
                 document = self.data_dict_to_doc(model, document_data)
                 self.insert_document(model.COLLECTION_NAME, document)
         return
@@ -65,3 +66,4 @@ class DatabaseOperations():
                 document[field] = data[field]
             else:
                 document[field] = ''
+        return document

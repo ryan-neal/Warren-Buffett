@@ -22,25 +22,26 @@ def main(input_filepath=None, output_filepath=None):
     # check if data path exists
     if os.path.exists(DATA_RAW_DIR):
         file_list = os.listdir(DATA_RAW_DIR)
+
+        # check if all the files are there
+        file_list_joined = ','.join(file_list)
+
+        missing = []
+        for year in VALID_REPORT_YEARS:
+            if str(year) not in file_list_joined:
+                missing.append(year)
+
+        if missing:
+            missing_str = ", ".join(map(str, missing))
+            logging.info('missing years: {}'.format(missing_str))
+            logging.info('running buffet scraper')
+            scrape_buffett()
+        else:
+            logger.info('data already exists. not running buffet scraper')
     else:
-        logging.error("Path {} does not exist.".format(DATA_RAW_DIR))
-        raise Exception
-
-    # check if all the files are there
-    file_list_joined = ','.join(file_list)
-
-    missing = []
-    for year in VALID_REPORT_YEARS:
-        if str(year) not in file_list_joined:
-            missing.append(year)
-
-    if missing:
-        missing_str = ", ".join(map(str, missing))
-        logging.info('missing years: {}'.format(missing_str))
+        logging.info("Path {} does not exist.".format(DATA_RAW_DIR))
         logging.info('running buffet scraper')
         scrape_buffett()
-    else:
-        logger.info('data already exists')
 
     logger.info('loading data into db')
     load_data()
