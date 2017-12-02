@@ -53,6 +53,15 @@ class DatabaseOperations():
 
         for file_name in file_directory:
             if file_name[0] != ".":
-                document = model.process_from_file(file_name)
+                document_data = model.data_from_file(file_name)
+                document = self.data_dict_to_doc(model, document_data)
                 self.insert_document(model.COLLECTION_NAME, document)
         return
+
+    def data_dict_to_doc(model, data):
+        document = {}
+        for field in model.FIELDS:
+            if field in data:
+                document[field] = data[field]
+            else:
+                document[field] = ''
