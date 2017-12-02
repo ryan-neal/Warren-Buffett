@@ -3,10 +3,10 @@ import os
 
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-from src.global_settings import SRC_DIR
+from src.global_settings import DATA_DIR
 
 SAVE_DIRS = {
-    'Buffett': os.getcwd().rsplit('Warren-Buffett', 1)[0] + os.path.join('Warren-Buffett', 'data', 'raw') + os.sep
+    'Buffett': os.path.join(DATA_DIR, 'raw')
 }
 
 
@@ -27,7 +27,8 @@ def scrape_buffett(save_dir=SAVE_DIRS['Buffett']):
     file_names = map(lambda tag: tag['href'], tags)
 
     for file_name in file_names:
-        if os.path.exists(save_dir + file_name):
+        file_path = os.path.join(save_dir, file_name)
+        if os.path.exists(file_path):
             continue  # we already scraped this
 
         content = urlopen(header + file_name).read()
@@ -38,15 +39,13 @@ def scrape_buffett(save_dir=SAVE_DIRS['Buffett']):
                 file_name = bs.find('a', {'href': re.compile('.*\.(pdf)')})['href']
                 content = urlopen(header + file_name).read()
 
-        local_file = open(save_dir + file_name, 'wb+')
+        local_file = open(file_path, 'wb+')
         local_file.write(content)
         local_file.close()
 
 
 if __name__ == '__main__':
-    # try:
-    #     scrape_buffett()
-    # except Exception as e:
-    #     print(e)
-
-    print(SRC_DIR)
+    try:
+        scrape_buffett()
+    except Exception as e:
+        print(e)

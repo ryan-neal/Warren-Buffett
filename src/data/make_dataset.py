@@ -5,13 +5,13 @@ import logging
 from dotenv import find_dotenv, load_dotenv
 from scraper import scrape_buffett
 from load_reports import load_data
-from src.global_settings import DATA_DIR
+from src.global_settings import DATA_DIR, DATA_RAW_DIR, VALID_REPORT_YEARS
 
 
 @click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
+@click.argument('input_filepath', default=DATA_RAW_DIR, type=click.Path(exists=True))
+@click.argument('output_filepath', default=DATA_DIR, type=click.Path())
+def main(input_filepath=None, output_filepath=None):
     """
     Runs data processing scripts to turn raw data from (../raw) into
     cleaned data ready to be analyzed (saved in ../processed).
@@ -19,16 +19,30 @@ def main(input_filepath, output_filepath):
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 
-    # if files are in there do not override
-    # chec
-    # if os.path.exists(DATA_DIR):
-    #     file_directory = os.listdir(DATA_DIR)
-    # else:
-    #     logging.error("Path {} does not exist.".format(DATA_DIR))
-    #     raise Exception
+    # check if data path exists
+    if os.path.exists(DATA_RAW_DIR):
+        file_list = os.listdir(DATA_RAW_DIR)
+    else:
+        logging.error("Path {} does not exist.".format(DATA_RAW_DIR))
+        raise Exception
 
-    scrape_buffett()
+    # check if all the files are there
+    file_list_joined = ','.join(file_list)
 
+    missing = []
+    for year in VALID_REPORT_YEARS:
+        if str(year) not in file_list_joined:
+            missing.append(year)
+
+    if missing:
+        missing_str = ", ".join(map(str, missing))
+        logging.info('missing years: {}'.format(missing_str))
+        logging.info('running buffet scraper')
+        scrape_buffett()
+    else:
+        logger.info('data already exists')
+
+    logger.info('loading data into db')
     load_data()
 
 
@@ -43,5 +57,4 @@ if __name__ == '__main__':
     # load up the .env entries as environment variables
     load_dotenv(find_dotenv())
 
-    # main()
-    print(DATA_DIR)
+    main()
