@@ -133,8 +133,8 @@ def get_phrases(document_text, expressions):
 def main():
     #print(get_entities(create_document(1999), 'person'))
     #print(get_tags(create_document(1999)))
-    print(get_noun_phrases(create_document(1999)))
-    #print(get_stems(create_document(1999)))
+    #print(get_noun_phrases(create_document(1999)))
+    print(get_stems(create_document(1999)))
     #x = freq_words(create_document(1999))
     #for key, value in x.items():
     #    print(key, value)
