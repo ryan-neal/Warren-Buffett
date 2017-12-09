@@ -161,7 +161,6 @@ def get_phrases(document_text, expressions):
                                 
     return phrases
 
-def get_lexical_diversity
 
 def phrase_count(phrases):
     """ Order phrases by commonality 
@@ -176,18 +175,24 @@ def phrase_count(phrases):
     return Counter(tup[0] for tup in phrases).most_common()
 
 
-def main():
-    pv = get_phrases(create_document(1999), [generate_expression('passive_voice')])
-    print('\n'.join(': '.join(tup) for tup in pv))
+def expression_percent(document_text, expressions):
+    """ Returns % of sentences with expressions out of total # of sentences """
+    phrases = get_phrases(document_text, expressions) 
+    phrase_sents = set(tup[1] for tup in phrases)
+    return len(phrase_sents) / get_sentence_count(document_text)
 
-    #print(create_document(1999))
-    #print(get_entities(create_document(1999), 'person'))
-    #print(get_tags(create_document(1999)))
-    #print(get_phrases(create_document(1999)))
-    #print(get_stems(create_document(1999)))
-    #x = freq_words(create_document(1999))
-    #for key, value in x.items():
-    #        print(key, value)
+# TODO: separate file
+def passive_voice_percent(start, end):
+    exp = [generate_expression('passive_voice')]
+    return [(year, expression_percent(create_document(year), exp))
+            for year in range(start, end)]
+
+def main():
+    #pv = get_phrases(create_document(1990), [generate_expression('passive_voice')])
+    #print('\n'.join(': '.join(tup) for tup in pv))
+    print(passive_voice_percent(2000, 2017))
+    
+
 
 
 if __name__ == '__main__':
