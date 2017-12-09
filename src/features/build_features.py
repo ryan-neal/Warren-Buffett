@@ -78,6 +78,10 @@ def get_word_count(document_text):
     word_token = [word for word in word_token if word.isalpha()]
     return (len(word_token))
 
+def get_lexical_diversity(document_text):
+    words = ntlk.word_tokenize(document_text)
+    return len(set(words))/len(words)
+
 def get_average_word_length(document_text):
     words = nltk.word_tokenize(document_text)
     filtered_words = list(filter(lambda word: word.isalpha(), words))
@@ -156,6 +160,8 @@ def get_phrases(document_text, expressions):
                 phrases.append((phrase, sentence))
                                 
     return phrases
+
+def get_lexical_diversity
 
 def phrase_count(phrases):
     """ Order phrases by commonality 
