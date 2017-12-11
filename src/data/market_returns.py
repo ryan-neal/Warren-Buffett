@@ -1,6 +1,7 @@
 from datetime import date
 from pandas_datareader import DataReader as dr
 import pandas as pd
+import numpy as np
 
 def get_market_returns():
     '''Getting Berkshire & SP 500 returns'''
@@ -16,10 +17,17 @@ def get_market_returns():
     dates_ann = pd.date_range(start_date, end_date, freq='A')
     ts_annualret = ts.reindex(dates_ann, method='ffill').pct_change()
     ts_annualret.pct_change()
-
+    ts_annualret.index = ts_annualret.index.strftime('%Y')
     return ts_annualret
 
+x = get_market_returns()
 
+def clean_buffett(x):
+    df = x["BRK-A"]
+    df.loc['1977'] = np.nan
+    df.loc['1978'] = np.nan
+    df = df.sort_index()
+    return df
 
 if __name__ == '__main__':
-    print(get_market_returns()["BRK-A"])
+    print(clean_buffett(x).loc["1981"])
