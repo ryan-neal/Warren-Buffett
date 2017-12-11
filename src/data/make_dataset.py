@@ -2,9 +2,9 @@
 import os
 import click
 import logging
-from dotenv import find_dotenv, load_dotenv
-from scraper import scrape_buffett
-from load_reports import load_data
+#from dotenv import find_dotenv, load_dotenv
+from src.data.scraper import scrape_buffett
+from src.data.load_reports import load_data
 from src.global_settings import DATA_DIR, DATA_RAW_DIR, VALID_REPORT_YEARS
 
 
@@ -56,6 +56,6 @@ if __name__ == '__main__':
 
     # find .env automagically by walking up directories until it's found, then
     # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
+    #load_dotenv(find_dotenv())
 
     main()
