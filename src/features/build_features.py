@@ -25,22 +25,10 @@ from collections import Counter
 import pprint
 #from src.data.load_reports import load_data
 
-import pymongo
-
-client = pymongo.MongoClient()
-db = client['BerkshireHathaway']['reports']
-
 USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
-
-def create_document(year):
-    """ Given a year, query MongoDB for the corresponding report """
-    return db.find_one({'year':str(year)})['text'].decode('utf-8')
 
 def significant_word(word):
     return word not in USELESS_WORDS and len(word) > 1# and word.isalpha()
-
-def clean_document(document_text):
-    pass
 
 def get_stems(document_text):
     """ Given the raw text of a document, return list of all unique stems """
@@ -52,7 +40,6 @@ def get_stems(document_text):
     data = document_text.lower()
     words = nltk.word_tokenize(data)
     return stem(filter(significant_word, words))
-
 
 def get_entities(document_text, entity_type=None):
     """ Given the raw text of a document, returns all named entities as a
