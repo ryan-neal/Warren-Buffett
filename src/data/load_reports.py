@@ -6,7 +6,7 @@ import os
 import re
 import textract
 import numpy as np
-from src.data.market_returns import clean_buffett, get_market_returns
+from src.data.market_returns import clean_buffett, get_market_returns, clean_sp
 from src.data import mongodb
 from src.global_settings import DATA_RAW_DIR
 
@@ -17,7 +17,7 @@ x = get_market_returns()
 class Report():
     def __init__(self):
         # Required variables
-        self.FIELDS = ['year', 'text', 'brk-returns']
+        self.FIELDS = ['year', 'text', 'brk-returns', 's&p-returns']
         self.COLLECTION_NAME = 'reports'
 
         # optional variables
@@ -29,7 +29,8 @@ class Report():
         data = {
             'year': "".join(re.findall(r'\d+', os.path.basename(file_path))),
             'text': (textract.process(file_path).decode('utf-8')),
-            'brk-returns': clean_buffett(x).loc[str("".join(re.findall(r'\d+', os.path.basename(file_path))))]
+            'brk-returns': clean_buffett(x).loc[str("".join(re.findall(r'\d+', os.path.basename(file_path))))],
+            's&p-returns': clean_sp(x).loc[str("".join(re.findall(r'\d+', os.path.basename(file_path))))]
         }
         return data
 

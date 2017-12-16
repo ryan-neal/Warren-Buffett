@@ -21,8 +21,11 @@ def word_count_year(all_years):
     show(p1)
     return
 
-def buffett_vs_market(years):
-    df = get_market_returns()
+def buffett_vs_market(all_years):
+    buffett = []
+    sp = []
+    for year in all_years:
+
     p2 = figure(title = "Buffett Vs the Market")
     p2.grid.grid_line_alpha = 0.3
     p2.xaxis.axis_label = 'Year'

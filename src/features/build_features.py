@@ -1,29 +1,10 @@
 from datetime import date
-import pandas as pd
 from pandas_datareader import DataReader as dr
-import sys
-import os
-import re
-import json
 import pandas as pd
-import numpy as np
-import requests
-from bs4 import BeautifulSoup
-import textract
 import string
-import spacy
-import redis
-import itertools as it
-import urllib3
-import matplotlib.pyplot as plt
-import pandas_datareader.data as web
-import datetime
-import seaborn as sns
 import nltk
 from nltk.corpus import stopwords
 from collections import Counter
-import pprint
-#from src.data.load_reports import load_data
 
 import pymongo
 
@@ -89,23 +70,6 @@ def get_average_word_length(document_text):
         
 def get_sentence_count(document_text):
     return len(nltk.sent_tokenize(document_text))
-
-def get_market_returns():
-    '''Getting Berkshire & SP 500 returns'''
-    start_date = date(1979, 12, 31)
-    end_date = date(2016, 12, 31)
-    y_bk = dr('BRK-A', 'yahoo', start=start_date)
-    y_bk = y_bk['Adj Close']
-    y_sp = dr('^SP500TR', 'yahoo', start=start_date) #TODO: Get longer backfill
-    y_sp = y_sp['Adj Close']
-    ts = pd.concat([y_bk, y_sp], axis=1)
-    ts.columns.values[0] = 'BRK-A'
-    ts.columns.values[1] = 'SP500TR'
-    dates_ann = pd.date_range(start_date, end_date, freq='A')
-    ts_annualret = ts.reindex(dates_ann, method='ffill').pct_change()
-    ts_annualret.pct_change()
-
-    return ts_annualret
 
 def freq_words(document_text):
     freqdist = nltk.FreqDist()
