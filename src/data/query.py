@@ -25,3 +25,10 @@ def get_bad_years():
     for item in bad_years:
         lst.append(item['year'])
     return(lst)
+
+def get_brk(year):
+    return db.find_one({'year': str(year)})['brk-returns']
+
+
+def get_sp(year):
+    return db.find_one({'year': str(year)})['s&p-returns']
