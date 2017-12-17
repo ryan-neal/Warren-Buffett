@@ -18,16 +18,56 @@ def get_market_returns():
     ts_annualret = ts.reindex(dates_ann, method='ffill').pct_change()
     ts_annualret.pct_change()
     ts_annualret.index = ts_annualret.index.strftime('%Y')
+
     return ts_annualret
 
 x = get_market_returns()
+
 
 def clean_buffett(x):
     df = x["BRK-A"]
     df.loc['1977'] = np.nan
     df.loc['1978'] = np.nan
     df = df.sort_index()
+
     return df
 
+def clean_sp(x):
+    # manually adding S&P 500 Total Returns as data source does not inlude
+    # backfill source is https://www.slickcharts.com/sp500/returns
+    df = x["SP500TR"]
+    sp5_backfill = {
+        1977: -0.0718,
+        1978: 0.0656,
+        1979: 0.1844,
+        1980: 0.3242,
+        1981: -0.0491,
+        1982: 0.2155,
+        1983: 0.2256,
+        1984: 0.0627,
+        1985: 0.3173,
+        1986: 0.1867,
+        1987: 0.0525,
+        1988: 0.1661
+    }
+
+    for k, v in sp5_backfill.items():
+        df[str(k)] = v
+
+    df = df.sort_index()
+    return df
+
+def get_difference(x):
+    x['BRK-A'] = clean_buffett(x)
+    x["SP500TR"] = clean_sp(x)
+    x["difference"] = x["BRK-A"] - x["SP500TR"]
+    df = x["difference"]
+    df.loc["1978"] = np.nan
+    df.loc["1977"] =np.nan
+    df = df.sort_index()
+    return(df)
+
 if __name__ == '__main__':
-    print(clean_buffett(x).loc["1981"])
+    print(clean_buffett(x))
+    print(clean_sp(x).loc["1981"])
+    print(get_difference(x))
