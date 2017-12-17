@@ -11,8 +11,7 @@ def clean_document(document_text):
     pass
 
 def get_good_years():
-    good_years = db.find( { "brk-returns": { '$gt':  } }, 
-                                  {"year": True, "_id": False })
+    good_years = db.find( { "brk-returns": { '$gt': 0 } }, {"year": True, "_id": False })
     lst = []
     for item in good_years:
         lst.append(item['year'])

@@ -1,12 +1,13 @@
 from datetime import date
-import pandas as pd
-from pandas_datareader
-import DataReader as dr
 import string
+
+import pandas as pd
+from pandas_datareader import DataReader as dr
 import nltk
 from nltk.corpus import stopwords
 from collections import Counter
 
+from src.data.query import * 
 
 USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
 
@@ -142,7 +143,7 @@ def phrase_count(phrases):
         list of tuples in the format (phrase, count)
     """
 
-    return Coun2ter(tup[0] for tup in phrases).most_common()
+    return Counter(tup[0] for tup in phrases).most_common()
 
 
 def expression_percent(document_text, expressions):
