@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>webapp</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  </head>
-  <body>
-    Welcome to webapp
-  </body>
-</html>
+{% extends "base.html" %}
+{% block title %}Main{% endblock %}
+{% block content %}
+    <h1>Index</h1>
+    <p class="important">
+      Welcome to my awesome homepage.
+    </p>
+{% endblock %}
