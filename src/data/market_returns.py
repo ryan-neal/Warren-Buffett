@@ -23,6 +23,7 @@ def get_market_returns():
 
 x = get_market_returns()
 
+
 def clean_buffett(x):
     df = x["BRK-A"]
     df.loc['1977'] = np.nan
@@ -56,6 +57,17 @@ def clean_sp(x):
     df = df.sort_index()
     return df
 
+def get_difference(x):
+    x['BRK-A'] = clean_buffett(x)
+    x["SP500TR"] = clean_sp(x)
+    x["difference"] = x["BRK-A"] - x["SP500TR"]
+    df = x["difference"]
+    df.loc["1978"] = np.nan
+    df.loc["1977"] =np.nan
+    df = df.sort_index()
+    return(df)
+
 if __name__ == '__main__':
-    print(clean_buffett(x).loc["1981"])
+    print(clean_buffett(x))
     print(clean_sp(x).loc["1981"])
+    print(get_difference(x))

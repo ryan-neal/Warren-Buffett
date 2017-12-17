@@ -1,6 +1,3 @@
-from datetime import date
-from pandas_datareader import DataReader as dr
-import pandas as pd
 import string
 import nltk
 from nltk.corpus import stopwords
@@ -13,15 +10,18 @@ db = client['BerkshireHathaway']['reports']
 
 USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
 
+def get_sp(year):
+    return db.find_one({'year': str(year)})['s&p-returns']
+
+def get_brk(year):
+    return db.find_one({'year': str(year)})['brk-returns']
+
 def create_document(year):
     """ Given a year, query MongoDB for the corresponding report """
     return db.find_one({'year':str(year)})['text'].decode('utf-8')
 
 def significant_word(word):
     return word not in USELESS_WORDS and len(word) > 1# and word.isalpha()
-
-def clean_document(document_text):
-    pass
 
 def get_stems(document_text):
     """ Given the raw text of a document, return list of all unique stems """
