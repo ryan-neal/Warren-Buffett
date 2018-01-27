@@ -1,25 +1,15 @@
-<<<<<<< HEAD
+from datetime import date
 import string
+
+import pandas as pd
+from pandas_datareader import DataReader as dr
 import nltk
 from nltk.corpus import stopwords
 from collections import Counter
 
-import pymongo
-
-client = pymongo.MongoClient()
-db = client['BerkshireHathaway']['reports']
+from src.data.query import * 
 
 USELESS_WORDS = stopwords.words("english") + list(string.punctuation)
-
-def get_sp(year):
-    return db.find_one({'year': str(year)})['s&p-returns']
-
-def get_brk(year):
-    return db.find_one({'year': str(year)})['brk-returns']
-
-def create_document(year):
-    """ Given a year, query MongoDB for the corresponding report """
-    return db.find_one({'year':str(year)})['text'].decode('utf-8')
 
 def significant_word(word):
     return word not in USELESS_WORDS and len(word) > 1# and word.isalpha()
@@ -34,7 +24,6 @@ def get_stems(document_text):
     data = document_text.lower()
     words = nltk.word_tokenize(data)
     return stem(filter(significant_word, words))
-
 
 def get_entities(document_text, entity_type=None):
     """ Given the raw text of a document, returns all named entities as a
@@ -71,6 +60,23 @@ def get_average_word_length(document_text):
         
 def get_sentence_count(document_text):
     return len(nltk.sent_tokenize(document_text))
+
+def get_market_returns():
+    '''Getting Berkshire & SP 500 returns'''
+    start_date = date(1979, 12, 31)
+    end_date = date(2016, 12, 31)
+    y_bk = dr('BRK-A', 'yahoo', start=start_date)
+    y_bk = y_bk['Adj Close']
+    y_sp = dr('^SP500TR', 'yahoo', start=start_date) #TODO: Get longer backfill
+    y_sp = y_sp['Adj Close']
+    ts = pd.concat([y_bk, y_sp], axis=1)
+    ts.columns.values[0] = 'BRK-A'
+    ts.columns.values[1] = 'SP500TR'
+    dates_ann = pd.date_range(start_date, end_date, freq='A')
+    ts_annualret = ts.reindex(dates_ann, method='ffill').pct_change()
+    ts_annualret.pct_change()
+
+    return ts_annualret
 
 def freq_words(document_text):
     freqdist = nltk.FreqDist()
@@ -145,27 +151,3 @@ def expression_percent(document_text, expressions):
     phrases = get_phrases(document_text, expressions) 
     phrase_sents = set(tup[1] for tup in phrases)
     return len(phrase_sents) / get_sentence_count(document_text)
-
-# TODO: separate file
-def passive_voice_percent(start, end):
-    exp = [generate_expression('passive_voice')]
-    return [(year, expression_percent(create_document(year), exp))
-            for year in range(start, end)]
-=======
-import parse
-from src.data import query
-
-def passive_voice_percent(start_year, end_year):
-    exp = [parse.generate_expression('passive_voice')]
-    return [(year, parse.expression_percent(query.create_document(year), exp))
-            for year in range(start_year, end_year)]
->>>>>>> 1ac2d3ac0ed7f0ebec15d529cc7c6ff035a4d132
-
-def main():
-    #pv = get_phrases(create_document(1990), [generate_expression('passive_voice')])
-    #print('\n'.join(': '.join(tup) for tup in pv))
-    print(passive_voice_percent(2000, 2017))
-
-
-if __name__ == '__main__':
-    main()
