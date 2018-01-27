@@ -1,4 +1,5 @@
-<<<<<<< HEAD
+from src.features import parse
+from src.data import query
 import string
 import nltk
 from nltk.corpus import stopwords
@@ -151,15 +152,11 @@ def passive_voice_percent(start, end):
     exp = [generate_expression('passive_voice')]
     return [(year, expression_percent(create_document(year), exp))
             for year in range(start, end)]
-=======
-import parse
-from src.data import query
 
 def passive_voice_percent(start_year, end_year):
     exp = [parse.generate_expression('passive_voice')]
     return [(year, parse.expression_percent(query.create_document(year), exp))
             for year in range(start_year, end_year)]
->>>>>>> 1ac2d3ac0ed7f0ebec15d529cc7c6ff035a4d132
 
 def main():
     #pv = get_phrases(create_document(1990), [generate_expression('passive_voice')])
