@@ -1,8 +1,9 @@
-
+import parse
+from src.data import query
 
 def passive_voice_percent(start_year, end_year):
-    exp = [generate_expression('passive_voice')]
-    return [(year, expression_percent(create_document(year), exp))
+    exp = [parse.generate_expression('passive_voice')]
+    return [(year, parse.expression_percent(query.create_document(year), exp))
             for year in range(start_year, end_year)]
 
 def main():
