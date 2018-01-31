@@ -42,7 +42,7 @@ def buffett_vs_market(all_years):
 
 
 def main():
-    # word_count_year(range(1977, 2017))
+    #word_count_year(range(1977, 2017))
     buffett_vs_market(range(1981, 2017))
 
 
