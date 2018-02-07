@@ -8,6 +8,8 @@ lxml
 textract
 python-dotenv>=0.5.1
 bokeh
+pandas_datareader
+NLTK
 
 # MongoDB Libraries
 pymongo
